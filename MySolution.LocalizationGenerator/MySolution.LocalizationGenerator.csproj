@@ -8,8 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\MySolution.SharedLocalizations\MySolution.SharedLocalizations.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="Spectre.Console" Version="0.49.1" />
       <PackageReference Include="Spectre.Console.Cli" Version="0.49.1" />
+      <PackageReference Include="Azure.AI.Translation.Text" Version="1.0.0" />
     </ItemGroup>
 
 </Project>
