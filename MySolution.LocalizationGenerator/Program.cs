@@ -166,9 +166,10 @@ void HandleAddNewResourceFile()
     var localizations = resourceFileService.ListLocalization(defaultPath);
 
     var translatedLocalizations = localizations
-        .Select(x => (x.Key, translatorService.Translate(x.Value, "pt", isoName)));
+        .Select(x => (x.Key, translatorService.Translate(x.Value, "pt", isoName)))
+        .ToList();
     
-    resourceFileService.AddDataLocalizations(path, localizations);
+    resourceFileService.AddDataLocalizations(path, translatedLocalizations);
     
     AnsiConsole.WriteLine();
     
