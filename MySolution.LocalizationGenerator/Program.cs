@@ -62,31 +62,33 @@ void HandleAddLocalization()
     
     var value = AnsiConsole.Prompt(
         new TextPrompt<string>("\U0001F449 Type the localization [bold green]DEFAULT VALUE[/] ?"));
-
-    AnsiConsole.WriteLine($"{key}:{value}");
-
-    var xmlService = new XmlService();
+    
     var resourceFileService = new ResourceFileService();
     var translatorService = new TranslatorService();
     
     var files = resourceFileService.ListResourceFiles();
 
+    AnsiConsole.WriteLine();
+    
     foreach (var file in files)
     {
         var path = Path.Combine(resourceFileService.ResourcePath, file!);
         var languageCode = resourceFileService.ExtractLanguageCode(file);
+
+        var targetLanguageValue = string.IsNullOrWhiteSpace(languageCode) ? 
+            value : 
+            translatorService.Translate(value, "pt", languageCode);
         
-        if (string.IsNullOrWhiteSpace(languageCode))
-        {
-            // Default resource
-            xmlService.AddDataElement(path, key, value);
-        }
-        else
-        {
-            var targetLanguageValue = translatorService.Translate(value, "pt", languageCode);
-            xmlService.AddDataElement(path, key, targetLanguageValue);
-        }
+        resourceFileService.AddDataLocalization(path, key, targetLanguageValue);
+        
+        AnsiConsole.MarkupLine(string.Format(
+            "\U0001F4AC The localization with key [bold yellow]{0}[/] and value [bold green]{1}[/] was added to [bold white]{2}[/]", 
+            key, 
+            targetLanguageValue, 
+            file));
     }
+    
+    AnsiConsole.WriteLine();
         
     Continue();
 }
@@ -148,7 +150,29 @@ void HandleAvailableLanguages()
 
 void HandleAddNewResourceFile()
 {
-    AnsiConsole.WriteLine($"Add new resource file");
+    var isoName = AnsiConsole.Prompt(
+        new TextPrompt<string>("\U0001F449 Type the language [bold white]ISO name[/] ?"));
+    
+    var resourceFileService = new ResourceFileService();
+    var translatorService = new TranslatorService();
+    
+    var file = $"SharedResources.{isoName}.resx";
+    var defaultFile = $"SharedResources.resx";
+    var path = Path.Combine(resourceFileService.ResourcePath, file);
+    var defaultPath = Path.Combine(resourceFileService.ResourcePath, defaultFile);
+    
+    resourceFileService.CreateFile(path);
+
+    var localizations = resourceFileService.ListLocalization(defaultPath);
+
+    var translatedLocalizations = localizations
+        .Select(x => (x.Key, translatorService.Translate(x.Value, "pt", isoName)));
+    
+    resourceFileService.AddDataLocalizations(path, localizations);
+    
+    AnsiConsole.WriteLine();
+    
+    AnsiConsole.MarkupLine($"\U0001F4C4 The localization file [bold white]{file}[/] was created");
     
     Continue();
 }
@@ -157,6 +181,7 @@ void Continue()
 {
     while (true)
     {
+        AnsiConsole.WriteLine();
         var confirmation = AnsiConsole.Prompt(
             new TextPrompt<bool>("[bold green]Continue[/] ?")
                 .AddChoice(true)
