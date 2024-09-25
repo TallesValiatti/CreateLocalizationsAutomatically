@@ -5,9 +5,9 @@ namespace MySolution.LocalizationGenerator;
 
 public class TranslatorService
 {
-    private const string ApiKey = "3f8275bd13104b7eba40741eac340dcb";
-    private const string Endpoint = "https://api.cognitive.microsofttranslator.com/";
-    private const string Region = "eastus";
+    private const string ApiKey = "<your-api-key>";
+    private const string Endpoint = "<your-endpoint>";
+    private const string Region = "<your-region>";
     
     
     public string Translate(string value, string sourceLanguage, string targetLanguage)
